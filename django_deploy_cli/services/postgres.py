@@ -1,7 +1,7 @@
+import typer
 from fabric import Connection
 from collections import OrderedDict
 from .utils import run_as_root, sudo_cd
-import typer
 
 
 class PostgresService:
@@ -124,3 +124,4 @@ class PostgresService:
 
     def _restart_postgres(self):
         run_as_root(self.conn, 'systemctl restart postgresql')
+        

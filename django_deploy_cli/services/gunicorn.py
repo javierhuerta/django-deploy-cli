@@ -1,7 +1,7 @@
+from os import path
 from fabric import Connection
 from jinja2 import Template
 from collections import OrderedDict
-from os import path
 from .utils import run_as_root
 from .constants import TEMPLATES_DIR
 
@@ -25,8 +25,9 @@ class GunicornService:
         run_as_root(self.conn, f'systemctl status {self.socket_file}')
         
     def create_systemd_socket(self):
-        #run_as_root(self.conn, f'touch /etc/systemd/system/{self.socket_file}')
-
+        """
+            Crear socket
+        """
         template = Template(open(path.join(TEMPLATES_DIR, 'gunicorn.socket')).read())
         result = template.render(description=f'{self.project_name} socket', socket_name=self.socket_name)
         with open(f'{self.socket_file}', 'w') as file:
@@ -39,8 +40,7 @@ class GunicornService:
         """
             Crear servicio
         """
-        #run_as_root(self.conn, f'touch /etc/systemd/system/{self.gunicorn_service_file}')
-
+    
         template = Template(open(path.join(TEMPLATES_DIR, 'gunicorn.service')).read())
         result = template.render(
             description=f'Gunicorn deamon for {self.project_name} project', 

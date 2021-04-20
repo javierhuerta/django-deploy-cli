@@ -1,6 +1,6 @@
+from os import path
 from fabric import Connection
 from jinja2 import Template
-from os import path
 from collections import OrderedDict
 from .utils import run_as_root
 from .constants import TEMPLATES_DIR

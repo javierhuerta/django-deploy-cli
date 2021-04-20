@@ -1,9 +1,9 @@
+import typer
 from fabric import Connection
 from .utils import run_as_root
 from . import groups
 from .constants import SYSTEM_GROUP_DEFAULT
 from collections import OrderedDict
-import typer
 
 
 class UserService:

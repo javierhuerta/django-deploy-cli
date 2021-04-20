@@ -2,6 +2,8 @@ import typer
 import click_spinner
 from dotenv import dotenv_values, set_key
 from fabric import Connection
+from paramiko import AuthenticationException
+from paramiko.ssh_exception import NoValidConnectionsError
 from .services.users import UserService
 from .services.postgres import PostgresService
 from .services.gunicorn import GunicornService
@@ -10,9 +12,6 @@ from .services.git import GitService
 from .services.firewall import setup_ufw
 from .services.constants import SYSTEM_USER_DEFAULT, SSH_PORT_DEFAULT, SSH_AUTH_METHOD_DEFAULT, SSH_AUTH_METHOD_PASSWORD
 from .services.constants import USER_DB, PASSWORD_DB, NAME_DB
-
-from paramiko import AuthenticationException
-from paramiko.ssh_exception import NoValidConnectionsError
 
 # App CLI
 app = typer.Typer()
