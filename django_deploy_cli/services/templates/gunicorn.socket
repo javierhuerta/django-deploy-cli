@@ -1,0 +1,8 @@
+[Unit]
+Description={{ description }}
+
+[Socket]
+ListenStream=/run/{{ socket_name }}
+
+[Install]
+WantedBy=sockets.target

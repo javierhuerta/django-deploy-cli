@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "django-deploy-cli"
+version = "0.1.0"
+description = ""
+authors = ["Javier Huerta <javierhuerta91@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+django-deploy-cli = "django_deploy_cli.main:app"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+typer = {extras = ["all"], version = "^0.3.2"}
+python-dotenv = "^0.17.0"
+click-spinner = "^0.1.10"
+fabric = "^2.6.0"
+Jinja2 = "^2.11.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

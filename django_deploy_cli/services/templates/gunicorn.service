@@ -1,0 +1,17 @@
+[Unit]
+Description={{ description }}
+Requires={{ socket_file }}
+After=network.target
+
+[Service]
+User={{ user }}
+Group={{ group }}
+WorkingDirectory={{ project_root }}
+ExecStart={{ gunicorn_bin }} \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/{{ socket_name }} \
+          {{ project_wsgi }}
+
+[Install]
+WantedBy=multi-user.target
