@@ -89,9 +89,9 @@ def setup(
     want_conf_db = typer.confirm("¿Quieres configurar el usuario y base de datos postgres de la aplicación?")
     if want_conf_db:
         typer.secho("(3) Configurando base de datos", fg=typer.colors.GREEN)
-        db_user = typer.prompt(f'¿Usuario para la base de datos?', default=config.get('USER_DB', USER_DB), show_default=True)
-        db_password = typer.prompt(f'¿Password para la base de datos? [.env -> PASSWORD_DB]', default=config.get('PASSWORD_DB', PASSWORD_DB), show_default=False)
-        db_name = typer.prompt(f'¿Nombre de la base de datos?', default=config.get('NAME_DB', NAME_DB), show_default=True)
+        db_user = typer.prompt(f'¿Usuario para la base de datos?', default=config.get('SQL_USER', USER_DB), show_default=True)
+        db_password = typer.prompt(f'¿Password para la base de datos? [.env -> SQL_PASSWORD]', default=config.get('SQL_PASSWORD', PASSWORD_DB), show_default=False)
+        db_name = typer.prompt(f'¿Nombre de la base de datos?', default=config.get('SQL_DATABASE', NAME_DB), show_default=True)
         database_service = PostgresService(c, config)
         with click_spinner.spinner() as spinner:
             database_service.create_user(db_user, db_password)
@@ -101,8 +101,8 @@ def setup(
         if update_env:
             # Actualizar configuraciones en .env
             set_key('.env', 'USER_DB', db_user)
-            set_key('.env', 'PASSWORD_DB', db_password)
-            set_key('.env', 'NAME_DB', db_name)
+            set_key('.env', 'SQL_PASSWORD', db_password)
+            set_key('.env', 'SQL_DATABASE', db_name)
 
     # Gunicorn
     want_conf_gunicorn = typer.confirm("¿Quieres configurar los archivos gunicorn para servir la aplicación?")
