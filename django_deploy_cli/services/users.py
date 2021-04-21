@@ -16,7 +16,10 @@ class UserService:
         """
             Comprobar si usuario de sistema ya se encuentra creado o no
         """
-        return self.conn.run(f'getent passwd {username}', warn=warn).ok
+        try:
+            return self.conn.run(f'getent passwd {username}', warn=warn).ok
+        except:
+            return False
 
     def create_user(self, username: str, default_group: bool = True):
         """

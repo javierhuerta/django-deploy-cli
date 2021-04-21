@@ -15,7 +15,7 @@ class GunicornService:
         self.socket_file = f'{self.project_name}.socket'
         self.gunicorn_service_file = f'{self.project_name}.service'
         self.socket_name = f'{self.project_name}.sock'
-        self.project_wsgi = f'{self.config.get('PROJECT_WSGI')}:application'
+        self.project_wsgi = f'{self.config.get("PROJECT_WSGI")}:application'
 
     def start_enable(self):
         run_as_root(self.conn, f'systemctl start {self.socket_file}')
