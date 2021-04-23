@@ -34,7 +34,7 @@ class DjangoService:
             file.close()
 
         if path.exists(config_filename_production):
-            self.conn.put(config_filename_production, f'{self.config.get("PROJECT_ROOT")}')
+            self.conn.put(config_filename_production, f'{self.config.get("PROJECT_ROOT")}.env')
             remove(config_filename_production)
 
     def deploy(self):
