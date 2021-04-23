@@ -1,5 +1,8 @@
+import secrets
 from fabric import Connection
 from invoke import env
+
+CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 
 def sudo_cd(c: Connection, path, command):
     """Workaround on the problem of cd not working with sudo command"""
@@ -16,3 +19,14 @@ def run_as_root(c: Connection, command, *args, **kwargs):
     else:
         func = c.sudo
     return func(command, *args, **kwargs)
+
+def generate_django_secret_key():
+    length = 50
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    secret_key = ''.join(secrets.choice(CHARS) for i in range(length))
+    return secret_key
+
+def generate_password():
+    length = 10
+    password = ''.join(secrets.choice(CHARS) for i in range(length))
+    return password

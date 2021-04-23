@@ -13,5 +13,7 @@ USER_DB = 'django'
 PASSWORD_DB = 'django'
 NAME_DB = 'django'
 
+ENV_FILENAME = '.env-deployment'
+
 APP_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = path.join(APP_DIR, 'templates')
