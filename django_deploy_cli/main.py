@@ -146,6 +146,11 @@ def debian_install(
         with click_spinner.spinner() as spinner:
             debian_service.install_firewall()
 
+    install_ssl_dependencies = typer.confirm("¿Quieres instalar las dependencias de sistema para instalar certifcado ssl gratuitos de Let's Encrypt con servidor web nginx?")
+    if install_ssl_dependencies:
+        with click_spinner.spinner() as spinner:
+            debian_service.install_ssl_dependencies()
+
     typer.secho("Proceso terminado", fg=typer.colors.GREEN)
 
 
@@ -160,8 +165,7 @@ def debian_nginx_ssl(
     debian_service = DebianService(c, config)
     install_ssl = typer.confirm(f'¿Quieres instalar el certificado ssl para la app {config.get("PROJECT_NAME")} con dominio {config.get("DOMAIN")}?')
     if install_ssl:
-        with click_spinner.spinner() as spinner:
-            debian_service.install_ssl()
+        debian_service.install_ssl()
 
     typer.secho("Proceso terminado", fg=typer.colors.GREEN)
     
