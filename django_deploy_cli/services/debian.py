@@ -32,3 +32,11 @@ class DebianService:
         run_as_root(self.conn, f'ufw allow https')
         run_as_root(self.conn, f'ufw enable')
         run_as_root(self.conn, f'ufw status')
+
+    def install_ssl(self):
+        run_as_root(self.conn, f'apt update')
+        run_as_root(self.conn, f'apt install python3-acme python3-certbot python3-mock python3-openssl python3-pkg-resources python3-pyparsing python3-zope.interface')
+        run_as_root(self.conn, f'apt install python3-certbot-nginx')
+        run_as_root(self.conn, f'certbot --nginx -d {self.config.get("DOMAIN")}', pty=True)
+        run_as_root(self.conn, f'certbot renew --dry-run', pty=True)
+
