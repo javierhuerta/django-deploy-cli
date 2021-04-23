@@ -14,14 +14,14 @@ class DebianService:
         self.project_name = self.config.get('PROJECT_NAME', 'django_app')
 
     def install_dependencies(self):
-        run_as_root(self.conn, f'apt update', pty=True)
-        run_as_root(self.conn, f'yes | apt upgrade', pty=True)
-        run_as_root(self.conn, f'apt update', pty=True)
-        run_as_root(self.conn, f'yes | apt install sudo', pty=True)
-        run_as_root(self.conn, f'yes | apt install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx curl', pty=True)
-        run_as_root(self.conn, f'-H pip3 install --upgrade pip', pty=True)
-        run_as_root(self.conn, f'-H pip3 install virtualenv', pty=True)
-        run_as_root(self.conn, f'yes | apt install nodejs npm', pty=True)
+        run_as_root(self.conn, f'apt update')
+        run_as_root(self.conn, f'apt upgrade', pty=True)
+        run_as_root(self.conn, f'apt update')
+        run_as_root(self.conn, f'yes | apt install sudo')
+        run_as_root(self.conn, f'yes | apt install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx curl')
+        run_as_root(self.conn, f'-H pip3 install --upgrade pip')
+        run_as_root(self.conn, f'-H pip3 install virtualenv')
+        run_as_root(self.conn, f'yes | apt install nodejs npm')
 
     def install_firewall(self):
         run_as_root(self.conn, f'apt update', pty=True)
