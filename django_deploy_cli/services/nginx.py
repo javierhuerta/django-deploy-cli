@@ -16,7 +16,7 @@ class NginxService:
         self.socket_name = f'{self.project_name}.sock'
 
     def enable(self):
-        run_as_root(self.conn, f'mkdir {self.config.get("PROJECT_ROOT")}logs')
+        run_as_root(self.conn, f'mkdir -p {self.config.get("PROJECT_ROOT")}logs')
         run_as_root(self.conn, f'touch {self.config.get("PROJECT_ROOT")}logs/nginx-access.log')
         run_as_root(self.conn, f'touch {self.config.get("PROJECT_ROOT")}logs/nginx-error.log')
         run_as_root(self.conn, f'ln -s /etc/nginx/sites-available/{self.nginx_filename} /etc/nginx/sites-enabled')

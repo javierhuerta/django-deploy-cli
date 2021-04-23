@@ -3,7 +3,7 @@ from fabric import Connection
 from jinja2 import Template
 from collections import OrderedDict
 from .utils import run_as_root
-from .constants import TEMPLATES_DIR
+from .constants import TEMPLATES_DIR, VIRTUALENV_FOLDERNAME
 
 
 class DjangoService:
@@ -39,15 +39,15 @@ class DjangoService:
 
     def create_virtualenv(self):
         with self.conn.cd(f'{self.config.get("PROJECT_ROOT")}'):
-            run_as_root(self.conn, f'virtualenv env')
+            run_as_root(self.conn, f'virtualenv {VIRTUALENV_FOLDERNAME}')
 
     def deploy(self):
         with self.conn.prefix(f'source {self.config.get("PROJECT_ENV")}bin/activate'):
             with self.conn.cd(f'{self.config.get("PROJECT_ROOT")}'):
                 self.conn.run('git pull', pty=True)
-                self.conn.run('npm install', pty=True) # En caso que exista un archivo package.json
-                self.conn.run('pip install -r requirements/prod.txt', pty=True)
+                self.conn.run('npm install') # En caso que exista un archivo package.json
+                self.conn.run('pip install -r requirements/prod.txt')
                 self.conn.run('python manage.py migrate')
-                self.conn.run('python manage.py collectstatic --no-input', pty=True)
+                self.conn.run('python manage.py collectstatic --no-input')
         run_as_root(self.conn, f'systemctl restart {self.socket_file}')
         run_as_root(self.conn, f'service nginx restart')

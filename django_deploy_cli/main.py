@@ -15,7 +15,7 @@ from .services.django import DjangoService
 from .services.debian import DebianService
 from .services.utils import generate_django_secret_key, generate_password, run_as_root
 from .services.constants import SYSTEM_USER_DEFAULT, SYSTEM_GROUP_DEFAULT, SSH_PORT_DEFAULT, SSH_AUTH_METHOD_DEFAULT, SSH_AUTH_METHOD_PASSWORD
-from .services.constants import USER_DB, PASSWORD_DB, NAME_DB, ENV_FILENAME, TEMPLATES_DIR
+from .services.constants import USER_DB, PASSWORD_DB, NAME_DB, ENV_FILENAME, TEMPLATES_DIR, VIRTUALENV_FOLDERNAME
 
 # App CLI
 app = typer.Typer()
@@ -78,7 +78,7 @@ def create_envfile():
         user = typer.prompt(f'¿Usuario de sistema operativo para la aplicación?')
         project_name = typer.prompt(f'¿Nombre del proyecto? (se usará para el nombre la carpeta y archivos de configuración)')
         project_root = typer.prompt(f'¿Ruta en sistema de archivos dónde quedara alojado la aplicación en el servidor?', default='/webapps/${PROJECT_NAME}/', show_default=True)
-        project_env = typer.prompt(f'¿Ruta a virtualenv del aplicativo?', default='${PROJECT_ROOT}env/', show_default=True)
+        project_env = typer.prompt(f'¿Ruta a virtualenv del aplicativo?', default='${PROJECT_ROOT}{VIRTUALENV_FOLDERNAME}/', show_default=True)
         project_wsgi = typer.prompt(f'¿Ruta de python a archivo wsgi?')
         sql_engine = typer.prompt(f'¿Motor de base de datos para settings en django?', default='django.db.backends.postgresql', show_default=True)
         sql_database = typer.prompt(f'¿Nombre de la base de datos?')
