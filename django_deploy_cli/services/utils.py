@@ -1,6 +1,8 @@
 import secrets
 from fabric import Connection
 from invoke import env
+from jinja2 import Template
+from os import path, remove
 
 CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 

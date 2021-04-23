@@ -38,8 +38,8 @@ class PostgresService:
             typer.secho(f'Usuario de base de datos {name} ya existe', fg=typer.colors.YELLOW)
 
 
-    def create_database(self, name, owner, template='template0', encoding='UTF8',
-                locale='es_CL.UTF-8'):
+    def create_database(self, name, owner, template='template0', encoding='utf8',
+                locale='es_CL.utf-8'):
         """
             Crear bd de forma segura 
         """
@@ -96,8 +96,8 @@ class PostgresService:
             return False
 
 
-    def _create_database_command(self, name, owner, template='template0', encoding='UTF8',
-                        locale='es_CL.UTF-8'):
+    def _create_database_command(self, name, owner, template='template0', encoding='utf8',
+                        locale='es_CL.utf-8'):
         """
         Crear base de datos postgres
         """

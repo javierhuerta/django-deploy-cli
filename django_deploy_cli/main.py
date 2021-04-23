@@ -11,8 +11,9 @@ from .services.postgres import PostgresService
 from .services.gunicorn import GunicornService
 from .services.nginx import NginxService
 from .services.git import GitService
-from .services.firewall import setup_ufw
-from .services.utils import generate_django_secret_key, generate_password
+from .services.django import DjangoService
+from .services.debian import DebianService
+from .services.utils import generate_django_secret_key, generate_password, run_as_root
 from .services.constants import SYSTEM_USER_DEFAULT, SYSTEM_GROUP_DEFAULT, SSH_PORT_DEFAULT, SSH_AUTH_METHOD_DEFAULT, SSH_AUTH_METHOD_PASSWORD
 from .services.constants import USER_DB, PASSWORD_DB, NAME_DB, ENV_FILENAME, TEMPLATES_DIR
 
@@ -20,6 +21,38 @@ from .services.constants import USER_DB, PASSWORD_DB, NAME_DB, ENV_FILENAME, TEM
 app = typer.Typer()
 # SETTINGS - Config environments
 config = dotenv_values(ENV_FILENAME)
+
+
+def test_connection(host, port, user, auth_method):
+    """
+        Probar conexion con el host
+    """
+    dict_conn = {
+        'host': host,
+        'port': port,
+        'user': user,
+    }
+    if auth_method == SSH_AUTH_METHOD_PASSWORD:
+        password = typer.prompt(f'Ingrese contraseña de servidor', hide_input=True)
+        dict_conn['connect_kwargs'] = { 'password': password }
+
+    c = Connection(**dict_conn)
+    with click_spinner.spinner() as spinner:
+        typer.secho(f'Intentando conectar a host {host}...', fg=typer.colors.GREEN)
+        try:
+            c.open()
+            typer.secho(f'Conexión establecida correctamente', fg=typer.colors.BLUE, underline=True)
+        except AuthenticationException as err:
+            typer.secho(f'Fallo en la autentificación', fg=typer.colors.RED, underline=True)
+            raise typer.Exit()
+        except NoValidConnectionsError as err:
+            typer.secho(f'Conexión no valida, revise el host y puerto', fg=typer.colors.RED, underline=True)
+            raise typer.Exit()
+        finally:
+            spinner.stop()
+
+    return c
+
 
 @app.command()
 def create_envfile():
@@ -92,6 +125,28 @@ def create_envfile():
 
 
 @app.command()
+def debian_install(
+    host: str = typer.Option(config.get('SSH_HOST'), prompt="Ingrese la dirección del servidor (host)", show_default=True), 
+    port: int = typer.Option(config.get('SSH_PORT', SSH_PORT_DEFAULT), prompt="Puerto de conexión ssh", show_default=True), 
+    user: str = typer.Option(config.get('SSH_USER', SYSTEM_USER_DEFAULT), prompt="Usuario", show_default=True), 
+    auth_method: str = config.get('SSH_AUTH_METHOD', SSH_AUTH_METHOD_DEFAULT)):
+    c = test_connection(host, port, user, auth_method)
+
+    debian_service = DebianService(c, config)
+    install_dependencies = typer.confirm("¿Quieres instalar las dependencias de sistema para una app Django?")
+    if install_dependencies:
+        with click_spinner.spinner() as spinner:
+            debian_service.install_dependencies()
+
+    install_firewall = typer.confirm("¿Quieres instalar y configurar el firewall ufw?")
+    if install_firewall:
+        with click_spinner.spinner() as spinner:
+            debian_service.install_firewall()
+
+    typer.secho("Proceso terminado", fg=typer.colors.GREEN)
+    
+
+@app.command()
 def setup(
     host: str = typer.Option(config.get('SSH_HOST'), prompt="Ingrese la dirección del servidor (host)", show_default=True), 
     port: int = typer.Option(config.get('SSH_PORT', SSH_PORT_DEFAULT), prompt="Puerto de conexión ssh", show_default=True), 
@@ -105,37 +160,9 @@ def setup(
     if not path.exists(ENV_FILENAME):
         typer.secho(f'Archivo de configuración {ENV_FILENAME} no existe. Primero debe crear este archivo ejecutando el comando "create-envfile".', fg=typer.colors.RED)
         raise typer.Exit()
-
-    dict_conn = {
-        'host': host,
-        'port': port,
-        'user': user,
-    }
-    if auth_method == SSH_AUTH_METHOD_PASSWORD:
-        password = typer.prompt(f'Ingrese contraseña de servidor', hide_input=True)
-        dict_conn['connect_kwargs'] = { 'password': password }
-
-    c = Connection(**dict_conn)
-    with click_spinner.spinner() as spinner:
-        typer.secho(f'Intentando conectar a host {host}...', fg=typer.colors.GREEN)
-        try:
-            c.open()
-            typer.secho(f'Conexión establecida correctamente', fg=typer.colors.BLUE, underline=True)
-            if update_env:
-                # Actualizar configuraciones en .env
-                set_key('.env', 'SSH_HOST', host)
-                set_key('.env', 'SSH_PORT', f'{port}')
-                set_key('.env', 'SSH_USER', user)
-                set_key('.env', 'SSH_AUTH_METHOD', auth_method)
-
-        except AuthenticationException as err:
-            typer.secho(f'Fallo en la autentificación', fg=typer.colors.RED, underline=True)
-            raise typer.Exit()
-        except NoValidConnectionsError as err:
-            typer.secho(f'Conexión no valida, revise el host y puerto', fg=typer.colors.RED, underline=True)
-            raise typer.Exit()
-        finally:
-            spinner.stop()
+    
+    # Probar conexión
+    c = test_connection(host, port, user, auth_method)
 
     # Usuario de sistema
     want_create_user = typer.confirm("¿Quieres crear el usuario de sistema?")
@@ -146,7 +173,6 @@ def setup(
         with click_spinner.spinner() as spinner:
             user_service.create_user(system_user, config)
             user_service.adduser_sudo(system_user)
-        del user_service
 
         if update_env:
             # Actualizar configuraciones en .env
@@ -160,7 +186,6 @@ def setup(
         git_service = GitService(c, config)
         with click_spinner.spinner() as spinner:
             git_service.clone_project(repo)
-        del git_service
 
     # Base de datos (postgres)
     want_conf_db = typer.confirm("¿Quieres configurar el usuario y base de datos postgres de la aplicación?")
@@ -189,11 +214,24 @@ def setup(
         with click_spinner.spinner() as spinner:
             gunicorn_service.create_systemd_socket()
             gunicorn_service.create_gunicorn_service()
+        
+    # Django
+    want_deploy_django = typer.confirm("¿Quieres copiar el archivo de variables de entorno a producción e instalar las dependencias de tu aplicación, migraciones, generar archivos estaticos... etc?")
+    django_service = DjangoService(c, config)
+    if want_deploy_django:
+        # Copiar archivo de variables de entorno a producción
+        typer.secho("Copiando archivo de variables de entorno", fg=typer.colors.BLUE)
+        django_service.copy_env_production()
+        # Deploy
+        typer.secho("Deploy...", fg=typer.colors.BLUE)
+        django_service.deploy()
+        typer.secho("Corregiendo permisos de usuario de aplicación sobre los archivos del proyecto", fg=typer.colors.BLUE)
+        # Permisos de usuario sobre archivos de proyecto
+        run_as_root(c, f'chown -R {config.get("USER")}.{config.get("GROUP")} {config.get("PROJECT_ROOT")}')
 
     gunicorn_active = typer.confirm("¿Quieres activar el servicio gunicorn?")
     if gunicorn_active:
         gunicorn_service.start_enable()
-    del gunicorn_service
 
     # Nginx
     want_conf_nginx = typer.confirm("¿Quieres configurar el archivo nginx del aplicativo?")

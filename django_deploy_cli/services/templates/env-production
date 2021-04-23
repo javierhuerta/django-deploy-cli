@@ -1,0 +1,7 @@
+DOMAIN={{web_domain}}
+DJANGO_SETTINGS_MODULE={{django_settings_module}}
+DJANGO_SECRET_KEY={{django_secret_key}}
+SQL_ENGINE={{sql_engine}}
+SQL_DATABASE={{sql_database}}
+SQL_USER={{sql_user}}
+SQL_PASSWORD={{sql_password}}
