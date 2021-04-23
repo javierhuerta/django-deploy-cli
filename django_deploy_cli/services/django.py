@@ -50,4 +50,4 @@ class DjangoService:
                 self.conn.run('python manage.py migrate')
                 self.conn.run('python manage.py collectstatic --no-input', pty=True)
         run_as_root(self.conn, f'systemctl restart {self.socket_file}')
-        run_as_root(self.conn, f'systemctl nginx reload')
+        run_as_root(self.conn, f'service nginx restart')
