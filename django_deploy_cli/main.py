@@ -256,7 +256,7 @@ def setup(
 def deploy(
     host: str = typer.Option(config.get('SSH_HOST'), prompt="Ingrese la dirección del servidor (host)", show_default=True), 
     port: int = typer.Option(config.get('SSH_PORT', SSH_PORT_DEFAULT), prompt="Puerto de conexión ssh", show_default=True), 
-    user: str = typer.Option(config.get('SSH_USER', SYSTEM_USER_DEFAULT), prompt="Usuario", show_default=True), 
+    user: str = typer.Option(config.get('USER', SYSTEM_USER_DEFAULT), prompt="Usuario", show_default=True), 
     auth_method: str = config.get('SSH_AUTH_METHOD', SSH_AUTH_METHOD_DEFAULT)):
     c = test_connection(host, port, user, auth_method)
 
