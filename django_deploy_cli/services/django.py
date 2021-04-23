@@ -38,6 +38,7 @@ class DjangoService:
             remove(config_filename_production)
 
     def deploy(self):
+        self.conn.local('git push')
         with self.conn.prefix(f'source {self.config.get("PROJECT_ENV")}bin/activate'):
             with self.conn.cd(f'{self.config.get("PROJECT_ROOT")}'):
                 self.conn.run('git pull', pty=True)

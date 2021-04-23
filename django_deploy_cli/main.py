@@ -246,3 +246,20 @@ def setup(
         nginx_service.enable()
 
     typer.secho("Proceso terminado", fg=typer.colors.GREEN)
+
+
+@app.command()
+def deploy(
+    host: str = typer.Option(config.get('SSH_HOST'), prompt="Ingrese la dirección del servidor (host)", show_default=True), 
+    port: int = typer.Option(config.get('SSH_PORT', SSH_PORT_DEFAULT), prompt="Puerto de conexión ssh", show_default=True), 
+    user: str = typer.Option(config.get('SSH_USER', SYSTEM_USER_DEFAULT), prompt="Usuario", show_default=True), 
+    auth_method: str = config.get('SSH_AUTH_METHOD', SSH_AUTH_METHOD_DEFAULT)):
+    c = test_connection(host, port, user, auth_method)
+
+    django_service = DjangoService(c, config)
+    typer.secho(f'Haciendo deploy de aplicación {config.get("PROJECT_NAME")}...', fg=typer.colors.GREEN)
+    with click_spinner.spinner() as spinner:
+        django_service.deploy()
+
+    typer.secho("Proceso terminado", fg=typer.colors.GREEN)
+    
