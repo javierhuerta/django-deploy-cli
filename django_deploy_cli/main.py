@@ -48,6 +48,9 @@ def test_connection(host, port, user, auth_method):
         except NoValidConnectionsError as err:
             typer.secho(f'Conexión no valida, revise el host y puerto', fg=typer.colors.RED, underline=True)
             raise typer.Exit()
+        except Exception as err:
+            typer.secho(f'Error en conexión', fg=typer.colors.RED, underline=True)
+            raise typer.Exit()
         finally:
             spinner.stop()
 
@@ -224,6 +227,7 @@ def setup(
         django_service.copy_env_production()
         # Deploy
         typer.secho("Deploy...", fg=typer.colors.BLUE)
+        django_service.create_virtualenv()
         django_service.deploy()
         typer.secho("Corregiendo permisos de usuario de aplicación sobre los archivos del proyecto", fg=typer.colors.BLUE)
         # Permisos de usuario sobre archivos de proyecto

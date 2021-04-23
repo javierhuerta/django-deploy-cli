@@ -19,7 +19,7 @@ class DjangoService:
         template = Template(open(path.join(TEMPLATES_DIR, 'env-production')).read())
         result = template.render(
             web_domain=self.config.get('DOMAIN'),
-            django_settings_module=self.config.get('DJANGO_SECRET_MODULE'),
+            django_settings_module=self.config.get('DJANGO_SETTINGS_MODULE'),
             django_secret_key=self.config.get('DJANGO_SECRET_KEY'),
             group=self.config.get('GROUP'),
             user=self.config.get('USER'),
@@ -29,16 +29,19 @@ class DjangoService:
             sql_password=self.config.get('SQL_PASSWORD')
         )
 
-        with open(config_filename_production, 'w') as file:
+        with open(self.config_filename_production, 'w') as file:
             file.write(result)
             file.close()
 
-        if path.exists(config_filename_production):
-            self.conn.put(config_filename_production, f'{self.config.get("PROJECT_ROOT")}.env')
-            remove(config_filename_production)
+        if path.exists(self.config_filename_production):
+            self.conn.put(self.config_filename_production, f'{self.config.get("PROJECT_ROOT")}.env')
+            remove(self.config_filename_production)
+
+    def create_virtualenv(self):
+        with self.conn.cd(f'{self.config.get("PROJECT_ROOT")}'):
+            run_as_root(self.conn, f'virtualenv env')
 
     def deploy(self):
-        self.conn.local('git push')
         with self.conn.prefix(f'source {self.config.get("PROJECT_ENV")}bin/activate'):
             with self.conn.cd(f'{self.config.get("PROJECT_ROOT")}'):
                 self.conn.run('git pull', pty=True)
