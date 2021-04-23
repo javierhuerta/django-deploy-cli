@@ -147,6 +147,23 @@ def debian_install(
             debian_service.install_firewall()
 
     typer.secho("Proceso terminado", fg=typer.colors.GREEN)
+
+
+@app.command()
+def debian_nginx_ssl(
+    host: str = typer.Option(config.get('SSH_HOST'), prompt="Ingrese la dirección del servidor (host)", show_default=True), 
+    port: int = typer.Option(config.get('SSH_PORT', SSH_PORT_DEFAULT), prompt="Puerto de conexión ssh", show_default=True), 
+    user: str = typer.Option(config.get('SSH_USER', SYSTEM_USER_DEFAULT), prompt="Usuario", show_default=True), 
+    auth_method: str = config.get('SSH_AUTH_METHOD', SSH_AUTH_METHOD_DEFAULT)):
+    c = test_connection(host, port, user, auth_method)
+
+    debian_service = DebianService(c, config)
+    install_ssl = typer.confirm(f'¿Quieres instalar el certificado ssl para la app {config.get("PROJECT_NAME")} con dominio {config.get("DOMAIN")}?')
+    if install_ssl:
+        with click_spinner.spinner() as spinner:
+            debian_service.install_ssl()
+
+    typer.secho("Proceso terminado", fg=typer.colors.GREEN)
     
 
 @app.command()
