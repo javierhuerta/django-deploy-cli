@@ -17,9 +17,10 @@ class DebianService:
         run_as_root(self.conn, f'apt update')
         run_as_root(self.conn, f'yes | apt install sudo')
         run_as_root(self.conn, f'yes | apt install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx curl')
-        run_as_root(self.conn, f'-H pip3 install --upgrade pip')
-        run_as_root(self.conn, f'-H pip3 install virtualenv')
+        run_as_root(self.conn, f'sudo -H pip3 install --upgrade pip')
+        run_as_root(self.conn, f'sudo -H pip3 install virtualenv')
         run_as_root(self.conn, f'yes | apt install nodejs npm')
+        run_as_root(self.conn, f'yes | apt install postgresql postgresql-contrib')
 
     def install_firewall(self):
         run_as_root(self.conn, f'apt update', pty=True)
