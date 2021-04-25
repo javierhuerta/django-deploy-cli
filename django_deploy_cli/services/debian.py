@@ -28,7 +28,7 @@ class DebianService:
         run_as_root(self.conn, f'ufw allow {self.config.get("SSH_PORT")}')
         run_as_root(self.conn, f'ufw allow http')
         run_as_root(self.conn, f'ufw allow https')
-        run_as_root(self.conn, f'ufw enable')
+        run_as_root(self.conn, f'yes | ufw enable')
         run_as_root(self.conn, f'ufw status')
 
     def install_ssl_dependencies(self):
