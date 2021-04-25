@@ -15,8 +15,6 @@ class DebianService:
 
     def install_dependencies(self):
         run_as_root(self.conn, f'apt update')
-        run_as_root(self.conn, f'apt upgrade', pty=True)
-        run_as_root(self.conn, f'apt update')
         run_as_root(self.conn, f'yes | apt install sudo')
         run_as_root(self.conn, f'yes | apt install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx curl')
         run_as_root(self.conn, f'-H pip3 install --upgrade pip')
