@@ -1,4 +1,4 @@
-from os import path
+from os import path, remove
 from fabric import Connection
 from jinja2 import Template
 from collections import OrderedDict
@@ -37,3 +37,4 @@ class NginxService:
             file.close()
 
         self.conn.put(f'{self.nginx_filename}', '/etc/nginx/sites-available/')
+        remove(self.nginx_filename)

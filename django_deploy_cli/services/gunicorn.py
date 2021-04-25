@@ -1,4 +1,4 @@
-from os import path
+from os import path, remove
 from fabric import Connection
 from jinja2 import Template
 from collections import OrderedDict
@@ -35,6 +35,7 @@ class GunicornService:
             file.close()
 
         self.conn.put(f'{self.socket_file}', '/etc/systemd/system/')
+        remove(self.socket_file)
 
     def create_gunicorn_service(self):
         """
@@ -58,3 +59,4 @@ class GunicornService:
             file.close()
 
         self.conn.put(f'{self.gunicorn_service_file}', '/etc/systemd/system/')
+        remove(self.gunicorn_service_file)
