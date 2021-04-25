@@ -143,6 +143,7 @@ def debian_install(
 
     install_firewall = typer.confirm("¿Quieres instalar y configurar el firewall ufw?")
     if install_firewall:
+        config.setdefault('SSH_PORT', port)
         with click_spinner.spinner() as spinner:
             debian_service.install_firewall()
 

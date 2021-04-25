@@ -20,6 +20,7 @@ class DebianService:
         run_as_root(self.conn, f'sudo -H pip3 install --upgrade pip')
         run_as_root(self.conn, f'sudo -H pip3 install virtualenv')
         run_as_root(self.conn, f'yes | apt install nodejs npm')
+        run_as_root(self.conn, f'yes | apt install nginx')
         run_as_root(self.conn, f'yes | apt install postgresql postgresql-contrib')
 
     def install_firewall(self):
