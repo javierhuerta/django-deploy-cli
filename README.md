@@ -16,3 +16,11 @@ Aplicación de terminal para apoyar en la puesta de producción en vps una app D
     - collectstatic
     - systemctl restart project_name
     - systemctl nginx restart
+
+.ssh folder
+* add "config" file with:
+    Host github.com
+    Port 22
+
+Test connection with github
+ssh -T git@github.com
