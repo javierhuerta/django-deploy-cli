@@ -17,6 +17,7 @@ Aplicación de terminal para apoyar en la puesta de producción en vps una app D
     - systemctl restart project_name
     - systemctl nginx restart
 
+## Instalación
 .ssh folder
 * add "config" file with:
     Host github.com
@@ -24,3 +25,6 @@ Aplicación de terminal para apoyar en la puesta de producción en vps una app D
 
 Test connection with github
 ssh -T git@github.com
+
+> nano /etc/locale.gen uncomment Update es-CL.utf-8
+> locale-gen
